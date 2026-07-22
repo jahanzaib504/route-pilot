@@ -9,6 +9,14 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
+import {getLocationLatLng, getLocationName} from "../services/map";
 
 const EMPTY_LOCATION = { name: "", lat: null, lng: null };
 
@@ -184,8 +192,6 @@ const InputField = ({ id, label, placeholder, icon, value, onChange }) => {
 
   function handleChange(e) {
     const name = e.target.value;
-    // Clear stale coordinates as soon as the user edits the text again,
-    // so a place can't be submitted with a name that no longer matches it.
     onChange({ name, lat: null, lng: null });
     setOpen(true);
   }
@@ -222,23 +228,8 @@ const InputField = ({ id, label, placeholder, icon, value, onChange }) => {
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
-        setError("");
-
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-            value.name
-          )}&format=json&addressdetails=0&limit=6`,
-          {
-            signal: controller.signal,
-            headers: {
-              Accept: "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) throw new Error("Lookup failed");
-
-        const data = await response.json();
+        setError(""); 
+        const data = await getLocationLatLng(value.name, controller.signal)
         setSuggestions(data);
         setOpen(true);
       } catch (err) {
