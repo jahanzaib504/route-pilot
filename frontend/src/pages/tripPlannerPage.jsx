@@ -16,7 +16,7 @@ import {
   Popup,
   useMapEvents,
 } from "react-leaflet";
-import {getLocationLatLng, getLocationName} from "../services/map";
+import { getLocationLatLng, getLocationName } from "../services/map";
 
 const EMPTY_LOCATION = { name: "", lat: null, lng: null };
 
@@ -54,7 +54,13 @@ const TripPlannerPage = () => {
     setSubmitting(true);
     try {
       // Hand off to your route-planning logic / API call here.
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      const response = await fetch('http://localhost:8000/trip_planner/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify({current: currentLoc, pickup: pickupLoc, dropoff: dropoffLoc, cycle_hour:hours}), // Serialize object to JSON string
+      });
       console.log({ currentLoc, pickupLoc, dropoffLoc, cycleHours: hours });
     } finally {
       setSubmitting(false);
@@ -228,7 +234,7 @@ const InputField = ({ id, label, placeholder, icon, value, onChange }) => {
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
-        setError(""); 
+        setError("");
         const data = await getLocationLatLng(value.name, controller.signal)
         setSuggestions(data);
         setOpen(true);
