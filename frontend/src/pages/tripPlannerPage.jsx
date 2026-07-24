@@ -71,7 +71,7 @@ const TripPlannerPage = () => {
         current_time: decimalHour,
       });
 
-      console.log(response.data);
+      const data = response.data
       setRoutePath(data['mapData'])
       setEldLogs(data['eldLogs'])
       let points = []
@@ -80,7 +80,14 @@ const TripPlannerPage = () => {
       });
       setPoints(points)
       navigate('/trip-results')
-    } finally {
+    } catch (e) {
+      const errorData = e.response?.data;
+
+      console.log(errorData);
+
+      setFormError(errorData.error);
+    }
+    finally {
       setSubmitting(false);
     }
   }
