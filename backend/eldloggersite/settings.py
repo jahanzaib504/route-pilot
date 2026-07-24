@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 CORS_ALLOWED_ORIGINS = [
-    ".vercel.app"
+    "https://route-pilot-pifr.vercel.app",
 ]
 ROOT_URLCONF = 'eldloggersite.urls'
 
