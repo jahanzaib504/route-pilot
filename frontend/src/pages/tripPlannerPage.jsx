@@ -8,7 +8,7 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -17,6 +17,7 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import { getLocationLatLng, getLocationName } from "../services/map";
+import routeContext from "../contexts/routeContext";
 
 const EMPTY_LOCATION = { name: "", lat: null, lng: null };
 
@@ -27,6 +28,7 @@ const TripPlannerPage = () => {
   const [cycleHours, setCycleHours] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
+  const {setEldLogs, setRoutePath} = useContext(routeContext);
 
   const isComplete =
     currentLoc.lat != null &&
@@ -54,14 +56,15 @@ const TripPlannerPage = () => {
     setSubmitting(true);
     try {
       // Hand off to your route-planning logic / API call here.
-      const response = await fetch('http://localhost:8000/trip_planner/', {
+      const response = await fetch('http://localhost:8000/trip_planner/post_data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', 
         },
         body: JSON.stringify({current: currentLoc, pickup: pickupLoc, dropoff: dropoffLoc, cycle_hour:hours}), // Serialize object to JSON string
       });
-      console.log({ currentLoc, pickupLoc, dropoffLoc, cycleHours: hours });
+      setRoutePath(await response.data)
+      
     } finally {
       setSubmitting(false);
     }

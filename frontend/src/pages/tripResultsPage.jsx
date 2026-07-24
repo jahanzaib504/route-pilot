@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { eldLogsData, routeSummaryData } from "../devData";
 import { Navigation, StopCircle, Timer, TimerIcon, LucideMessageCircleWarning } from "lucide-react"
+import routeContext from "../contexts/routeContext";
+import DisplayEldGraph from "../components/DisplayEldGraph"
 const TripResultPage = () => {
-    const [routeSummary, setRouteSummary] = useState(routeSummaryData);
-    const [eldLogs, setEldLogs] = useState(eldLogsData); // Array of eld logs for each day
+    const { eldLogs, routePath } = useContext(routeContext);
+
     return (<div className="relative min-h-screen overflow-hidden text-white bg-slate-950">
         <div className="max-w-5xl mx-auto">
             <h1 className="text-center text-4xl text-blue-400 mt-3">Trip Results</h1>
@@ -23,21 +25,5 @@ const SummaryOutput = ({ placeholder, value, icon }) => {
         <div className="text-white gap-1 items-center text-xl font-bold flex"><span className="text-blue-500">{icon}</span><h2>{placeholder}</h2></div>
         <p>{value}</p>
     </div>)
-}
-const DisplayEldLogs = ({ eldLogs = [] }) => {
-    return (<div>
-        {eldLogs && eldLogs.length > 0 && eldLogs.map((data) => (
-            <DisplayELDGraph eldLog={data}/>
-        ))}
-    </div>)
-}
-const DisplayELDGraph = ({ eldLog }) => {
-    return (<svg
-        width="100%"
-        height="260"
-        viewBox="0 0 1200 260"
-        className="border rounded-xl bg-white"
-    >
-    </svg>)
 }
 export default TripResultPage;

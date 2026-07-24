@@ -1,6 +1,11 @@
 import { MapPinned, Truck, Clock3, Route, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router";
 
 const HomePage = () => {
+  const navigate = useNavigate()
+  const redirect = ()=>{
+    navigate('/plan-trip')
+  }
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-hidden">
       {/* Background */}
@@ -15,7 +20,7 @@ const HomePage = () => {
           RoutePilot
         </h1>
 
-        <button className="rounded-xl bg-blue-600 px-6 py-3 font-semibold transition hover:bg-blue-700">
+        <button className="rounded-xl bg-blue-600 px-6 py-3 font-semibold transition hover:bg-blue-700" onClick={redirect}>
           Plan Trip
         </button>
       </nav>
@@ -40,7 +45,7 @@ const HomePage = () => {
         </p>
 
         <div className="mt-12 flex gap-5">
-          <button className="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold transition hover:bg-blue-700">
+          <button className="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold transition hover:bg-blue-700" onClick={redirect}>
             Plan Your Trip
             <ArrowRight size={20} />
           </button>
