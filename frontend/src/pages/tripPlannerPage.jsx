@@ -18,7 +18,8 @@ import {
 } from "react-leaflet";
 import { getLocationLatLng, getLocationName } from "../services/map";
 import routeContext from "../contexts/routeContext";
-import {useNavigate} from "react-router"
+import { useNavigate } from "react-router"
+import api from "../axios";
 const EMPTY_LOCATION = { name: "", lat: null, lng: null };
 
 const TripPlannerPage = () => {
@@ -62,15 +63,15 @@ const TripPlannerPage = () => {
         now.getHours() +
         now.getMinutes() / 60 +
         now.getSeconds() / 3600;
-      const response = await fetch('http://localhost:8000/trip_planner/post_data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ current: currentLoc, pickup: pickupLoc, dropoff: dropoffLoc, cycle_hour: hours, current_time: decimalHour }), // Serialize object to JSON string
+      const response = await api.post("/trip_planner/post_data", {
+        current: currentLoc,
+        pickup: pickupLoc,
+        dropoff: dropoffLoc,
+        cycle_hour: hours,
+        current_time: decimalHour,
       });
-      const data = await response.json()
-      console.log(data)
+
+      console.log(response.data);
       setRoutePath(data['mapData'])
       setEldLogs(data['eldLogs'])
       let points = []
