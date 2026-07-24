@@ -5,13 +5,15 @@ import TripResultPage from './pages/tripResultsPage'
 import routeContext from './contexts/routeContext'
 import {Route, Routes} from "react-router"
 import TripResultRoute from './routes/tripResultRoute'
+import { point } from 'leaflet'
 function App() {
   const [eldLogs, setEldLogs] = useState(null)
   const [loading, setLoading] = useState(false);
   const [routePath, setRoutePath] = useState(null)
+  const [points, setPoints] = useState(null)
   return (
     <>
-    <routeContext.Provider value={{eldLogs, setEldLogs, loading, setLoading, routePath, setRoutePath}}>
+    <routeContext.Provider value={{eldLogs, setEldLogs, loading, setLoading, routePath, setRoutePath, points, setPoints}}>
     <Routes>
         <Route element={<HomePage />} path='/'/>
         <Route element={<TripResultRoute><TripResultPage /></TripResultRoute>} path='/trip-results'/>

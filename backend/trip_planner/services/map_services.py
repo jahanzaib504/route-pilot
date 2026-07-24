@@ -15,7 +15,8 @@ def get_route(points):
         "points": points,       # Must be [[lon1, lat1], [lon2, lat2]] format for POST
         "profile": "car",        # Fixed typo: "profile"
         "elevation": False,
-        "instructions": False
+        "instructions": False,
+        "points_encoded": False
     }
 
     

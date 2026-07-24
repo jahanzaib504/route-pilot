@@ -1,29 +1,76 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { eldLogsData, routeSummaryData } from "../devData";
 import { Navigation, StopCircle, Timer, TimerIcon, LucideMessageCircleWarning } from "lucide-react"
 import routeContext from "../contexts/routeContext";
+import { MapContainer, TileLayer, Polyline, Marker, Popup } from "react-leaflet";
+import { LatLngBounds, point } from "leaflet";
 import DisplayEldGraph from "../components/DisplayEldGraph"
-const TripResultPage = () => {
-    const { eldLogs, routePath } = useContext(routeContext);
 
-    return (<div className="relative min-h-screen overflow-hidden text-white bg-slate-950">
-        <div className="max-w-5xl mx-auto">
-            <h1 className="text-center text-4xl text-blue-400 mt-3">Trip Results</h1>
-            <div className="px-4 py-4 mt-3 bg-slate-900/50 flex justify-evenly">
-                <SummaryOutput placeholder={"Current Location"} value={routeSummary.currentLocation} icon={<Navigation />} />
-                <SummaryOutput placeholder={"Pickup Location"} value={routeSummary.pickupLocation} icon={<Navigation />} />
-                <SummaryOutput placeholder={"Dropoff Location"} value={routeSummary.dropoffLocation} icon={<Navigation />} />
-                <SummaryOutput placeholder={"Estimated Trip Duration"} value={routeSummary.estimatedTripDuration} icon={<Timer />} />
+
+const TripResultPage = () => {
+    const { eldLogs, routePath, points, setEldLogs, setRoutePath, setPoints } = useContext(routeContext);
+    const coordinates = useMemo(() => {
+        if (!routePath?.paths?.length) return [];
+        // Changing the format
+        return routePath.paths[0].points.coordinates.map(([lng, lat]) => [
+            lat,
+            lng,
+        ]);
+    }, [routePath]);
+    
+    const bounds = useMemo(() => {
+        if (coordinates.length === 0) return null;
+
+        return new LatLngBounds(coordinates);
+    }, [coordinates]);
+    
+    if (!coordinates.length)
+        return (
+            <div className="flex h-screen items-center justify-center">
+                Loading Route...
             </div>
-            {!routeSummary.isPossible && <div className="py-2 px-1 bg-red-400 w-full text-lg flex items-center justify-center gap-2"><span><LucideMessageCircleWarning size={20} /></span>Unfortunately this trip is not HOS complaint. Please create an HOS complaint </div>}
-            {routeSummary.isPossible}
+        );
+
+    return (
+        <div className="h-screen w-screen">
+            <MapContainer
+                bounds={bounds}
+                scrollWheelZoom
+                className="h-full w-full"
+            >
+                <TileLayer
+                    attribution="© OpenStreetMap contributors"
+                    url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {/*Connects all the coordinates */}
+                <Polyline
+                    positions={coordinates}
+                    pathOptions={{
+                        color: "#2563eb",
+                        weight: 6,
+                        opacity: 0.9,
+                    }}
+                />
+                {points.map((point, index) => {
+                    const labels = [
+                        "Current Location",
+                        "Pickup Location",
+                        "Drop-off Location",
+                    ];
+                    const colors = [
+                        "bg-blue-500",
+                        "bg-green-500",
+                        "bg-red-500"
+                    ]
+
+                    return (
+                        <Marker key={index} position={point}>
+                            <Popup>{labels[index] || `Stop ${index + 1}`}</Popup>
+                        </Marker>
+                    );
+                })}
+            </MapContainer>
         </div>
-    </div>)
-}
-const SummaryOutput = ({ placeholder, value, icon }) => {
-    return (<div className="flex flex-col gap-2 w-50">
-        <div className="text-white gap-1 items-center text-xl font-bold flex"><span className="text-blue-500">{icon}</span><h2>{placeholder}</h2></div>
-        <p>{value}</p>
-    </div>)
+    );
 }
 export default TripResultPage;

@@ -3,11 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .serializers import TripSerializer
-from .map_services import get_route
-
+from .services.map_services import get_route
+from .services.generate_eld_logs import generate_eld_logs
 @api_view(["POST"])
 def post_data(request):
     serializer = TripSerializer(data=request.data)
+    print(request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
@@ -47,5 +48,5 @@ def post_data(request):
             }, 
             status=status.HTTP_400_BAD_REQUEST
         )
-        
-    return Response(map_data, status=status.HTTP_200_OK)
+    routeData = {'mapData':map_data, 'eldLogs':generate_eld_logs(estimated_time_in_hours, data['current_time'])}    
+    return Response(routeData, status=status.HTTP_200_OK)

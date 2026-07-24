@@ -18,7 +18,7 @@ import {
 } from "react-leaflet";
 import { getLocationLatLng, getLocationName } from "../services/map";
 import routeContext from "../contexts/routeContext";
-
+import {useNavigate} from "react-router"
 const EMPTY_LOCATION = { name: "", lat: null, lng: null };
 
 const TripPlannerPage = () => {
@@ -28,8 +28,8 @@ const TripPlannerPage = () => {
   const [cycleHours, setCycleHours] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
-  const {setEldLogs, setRoutePath} = useContext(routeContext);
-
+  const { setEldLogs, setRoutePath, setPoints, setLoading } = useContext(routeContext);
+  const navigate = useNavigate()
   const isComplete =
     currentLoc.lat != null &&
     pickupLoc.lat != null &&
@@ -56,15 +56,29 @@ const TripPlannerPage = () => {
     setSubmitting(true);
     try {
       // Hand off to your route-planning logic / API call here.
+      const now = new Date();
+
+      const decimalHour =
+        now.getHours() +
+        now.getMinutes() / 60 +
+        now.getSeconds() / 3600;
       const response = await fetch('http://localhost:8000/trip_planner/post_data', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', 
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({current: currentLoc, pickup: pickupLoc, dropoff: dropoffLoc, cycle_hour:hours}), // Serialize object to JSON string
+        body: JSON.stringify({ current: currentLoc, pickup: pickupLoc, dropoff: dropoffLoc, cycle_hour: hours, current_time: decimalHour }), // Serialize object to JSON string
       });
-      setRoutePath(await response.data)
-      
+      const data = await response.json()
+      console.log(data)
+      setRoutePath(data['mapData'])
+      setEldLogs(data['eldLogs'])
+      let points = []
+      await [currentLoc, pickupLoc, dropoffLoc].forEach(element => {
+        points.push([element.lat, element.lng])
+      });
+      setPoints(points)
+      navigate('/trip-results')
     } finally {
       setSubmitting(false);
     }

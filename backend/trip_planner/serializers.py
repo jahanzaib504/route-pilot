@@ -13,3 +13,4 @@ class TripSerializer(serializers.Serializer):
     pickup = LocationSerializer()
     dropoff = LocationSerializer()
     cycle_hour = serializers.IntegerField(min_value=0, max_value=69, required=True)
+    current_time = serializers.FloatField(min_value=0, max_value=24, required=True)
